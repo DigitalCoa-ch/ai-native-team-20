@@ -5,30 +5,83 @@ import { clients as initialClients } from "./lib/data";
 import { Client } from "./lib/types";
 import Link from "next/link";
 
-function riskColor(index: number) {
-  if (index >= 75) return "bg-error text-on-error";
-  if (index >= 50) return "bg-warning text-on-warning";
-  return "bg-outline text-white";
+function riskLevel(index: number): "high" | "medium" | "low" {
+  if (index >= 75) return "high";
+  if (index >= 50) return "medium";
+  return "low";
 }
 
-function riskBarColor(index: number) {
-  if (index >= 75) return "bg-error";
-  if (index >= 50) return "bg-warning";
-  return "bg-outline";
+function riskPill(level: ReturnType<typeof riskLevel>) {
+  const map = {
+    high: { bg: "#fef2f2", text: "#dc2626", border: "#fecaca", label: "High" },
+    medium: { bg: "#fff7ed", text: "#ea580c", border: "#fed7aa", label: "Medium" },
+    low: { bg: "#f8fafc", text: "#64748b", border: "#e2e8f0", label: "Low" },
+  }[level];
+  return (
+    <span
+      style={{
+        backgroundColor: map.bg,
+        color: map.text,
+        borderColor: map.border,
+        fontSize: 11,
+        fontWeight: 600,
+        padding: "2px 8px",
+        borderRadius: 3,
+        border: "1px solid",
+        letterSpacing: "0.02em",
+        textTransform: "uppercase",
+      }}
+    >
+      {map.label}
+    </span>
+  );
 }
 
-function confidenceColor(conf: number) {
-  if (conf >= 90) return "text-primary";
-  if (conf >= 80) return "text-secondary";
-  return "text-tertiary";
+function stressBar(index: number) {
+  const color = index >= 75 ? "#dc2626" : index >= 50 ? "#ea580c" : "#94a3b8";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div
+        style={{
+          flex: 1,
+          height: 6,
+          backgroundColor: "#edf0f3",
+          borderRadius: 3,
+          overflow: "hidden",
+          minWidth: 80,
+        }}
+      >
+        <div
+          style={{
+            width: `${index}%`,
+            height: "100%",
+            backgroundColor: color,
+            borderRadius: 3,
+            transition: "width 0.3s ease",
+          }}
+        />
+      </div>
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: "#0f172a",
+          minWidth: 28,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {index}
+      </span>
+    </div>
+  );
 }
 
-function statusBadge(status: Client["status"]) {
-  if (status === "approved")
-    return <span className="text-xs px-2 py-0.5 rounded bg-success/10 text-success font-medium">Approved</span>;
-  if (status === "rejected")
-    return <span className="text-xs px-2 py-0.5 rounded bg-outline/20 text-tertiary font-medium">Rejected</span>;
-  return null;
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function Dashboard() {
@@ -37,170 +90,386 @@ export default function Dashboard() {
   const pendingCount = sorted.filter((c) => c.status === "pending").length;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f7f9fb" }}>
-      {/* Header */}
-      <header
-        className="bg-white"
-        style={{ borderBottom: "1px solid #cbd5e1" }}
-      >
+    <div style={{ minHeight: "100vh", backgroundColor: "#f7f9fb", fontFamily: "'Inter', sans-serif" }}>
+      {/* ── Top Navigation ───────────────────────────────────── */}
+      <header style={{ backgroundColor: "#0f172a", borderBottom: "1px solid #1e293b" }}>
         <div
-          className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between"
-          style={{ gap: 24 }}
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: 56,
+          }}
         >
-          <div className="flex items-center gap-3">
+          {/* Logo + wordmark */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
-              className="w-8 h-8 rounded flex items-center justify-center"
-              style={{ backgroundColor: "#0f172a" }}
-            >
-              <span className="text-white font-bold text-sm">AI</span>
-            </div>
-            <span
-              className="font-semibold text-lg"
-              style={{ color: "#0f172a" }}
-            >
-              Client Alert Dashboard
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span
-              className="px-3 py-1 rounded text-xs font-medium"
               style={{
-                backgroundColor: pendingCount > 0 ? "#ea580c" : "#16a34a",
-                color: "#ffffff",
+                width: 32,
+                height: 32,
+                backgroundColor: "#ffffff",
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {pendingCount} alert{pendingCount !== 1 ? "s" : ""}
+              <span style={{ color: "#0f172a", fontWeight: 800, fontSize: 13 }}>AI</span>
+            </div>
+            <span style={{ color: "#ffffff", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em" }}>
+              ClientAlert
             </span>
+            <span
+              style={{
+                color: "#94a3b8",
+                fontSize: 13,
+                fontWeight: 400,
+                marginLeft: 4,
+                display: "none",
+              }}
+            >
+              — Retail Banking
+            </span>
+          </div>
+
+          {/* Nav links */}
+          <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+            {["Dashboard", "Clients", "Reports", "Settings"].map((item, i) => (
+              <span
+                key={item}
+                style={{
+                  color: i === 0 ? "#ffffff" : "#94a3b8",
+                  fontSize: 13,
+                  fontWeight: i === 0 ? 500 : 400,
+                  cursor: "pointer",
+                  borderBottom: i === 0 ? "2px solid #ffffff" : "2px solid transparent",
+                  paddingBottom: 18,
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </nav>
+
+          {/* Alert count badge */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor: pendingCount > 0 ? "#dc2626" : "#16a34a",
+                borderRadius: 4,
+                padding: "5px 12px",
+              }}
+            >
+              <span style={{ color: "#ffffff", fontSize: 12, fontWeight: 600 }}>
+                {pendingCount} ALERT{pendingCount !== 1 ? "S" : ""}
+              </span>
+            </div>
+            {/* Avatar */}
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                backgroundColor: "#1e293b",
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#94a3b8",
+              }}
+            >
+              JM
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px" }}>
 
-        {/* Page title */}
-        <div className="mb-8">
+        {/* ── Page Header ──────────────────────────────────────── */}
+        <div style={{ marginBottom: 28 }}>
           <h1
-            className="text-2xl"
-            style={{ fontWeight: 700, lineHeight: 1.2, color: "#0f172a" }}
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              color: "#0f172a",
+              lineHeight: 1.2,
+              letterSpacing: "-0.02em",
+              margin: 0,
+            }}
           >
             Financial Stress Alerts
           </h1>
-          <p className="text-sm mt-1" style={{ color: "#475569", lineHeight: 1.5 }}>
-            Ranked by AI-detected stress — nightly analysis across your client portfolio
+          <p style={{ fontSize: 14, color: "#475569", marginTop: 6, lineHeight: 1.5, margin: "6px 0 0" }}>
+            AI-driven monitoring across{" "}
+            <strong style={{ color: "#0f172a", fontWeight: 600 }}>247 clients</strong> — nightly analysis
           </p>
         </div>
 
-        {/* Column labels */}
+        {/* ── Filters / Summary Stats ──────────────────────────── */}
         <div
-          className="hidden sm:flex items-center gap-4 px-5 py-2 mb-2"
-          style={{ color: "#475569", fontSize: 12, fontWeight: 500, lineHeight: 1.4 }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 16,
+            marginBottom: 24,
+          }}
         >
-          <div className="flex-1">Client</div>
-          <div className="w-20 text-center">Stress</div>
-          <div className="w-16 text-center">Confidence</div>
-          <div className="w-20 text-right">Action</div>
-        </div>
-
-        {/* Client rows */}
-        <div className="space-y-3">
-          {sorted.map((client) => (
-            <Link
-              key={client.id}
-              href={`/clients/${client.id}`}
-              className="block"
+          {[
+            { label: "Total Clients Monitored", value: "247", delta: "All portfolios" },
+            { label: "Active Alerts", value: String(pendingCount), delta: "Requires review", accent: pendingCount > 0 },
+            { label: "High Risk", value: String(sorted.filter((c) => c.stressIndex >= 75).length), delta: "≥75 stress index" },
+            { label: "Avg Confidence", value: "86%", delta: "Model accuracy" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
               style={{
                 backgroundColor: "#ffffff",
                 border: "1px solid #cbd5e1",
                 borderRadius: 4,
                 padding: "16px 20px",
-                transition: "box-shadow 0.15s ease",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.boxShadow = "0 2px 8px rgba(15,23,42,0.08)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.boxShadow = "none")
-              }
             >
-              <div className="flex items-center gap-4">
-                {/* Client info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className="font-semibold text-base"
-                      style={{ color: "#0f172a", lineHeight: 1.4 }}
-                    >
-                      {client.name}
-                    </span>
-                    <span
-                      className="text-sm"
-                      style={{ color: "#94a3b8" }}
-                    >
-                      ••••{client.accountNumber}
-                    </span>
-                    {statusBadge(client.status)}
-                  </div>
-                  <p
-                    className="text-sm mt-0.5 truncate"
-                    style={{ color: "#475569", lineHeight: 1.5 }}
-                  >
-                    {client.trigger}
-                  </p>
-                </div>
-
-                {/* Stress score */}
-                <div className="flex flex-col items-center gap-1.5 w-20">
-                  <div
-                    className="px-2.5 py-1 rounded text-sm font-semibold"
-                    style={{ backgroundColor: riskColor(client.stressIndex).split(" ")[0], color: riskColor(client.stressIndex).split(" ")[1] }}
-                  >
-                    {client.stressIndex}
-                  </div>
-                  {/* Stress bar */}
-                  <div
-                    className="w-full h-1 rounded-full overflow-hidden"
-                    style={{ backgroundColor: "#e2e6ea" }}
-                  >
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${client.stressIndex}%`,
-                        backgroundColor: riskBarColor(client.stressIndex),
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Confidence */}
-                <div
-                  className="text-sm font-medium w-16 text-center"
-                  style={{ color: confidenceColor(client.confidence) }}
-                >
-                  {client.confidence}%
-                </div>
-
-                {/* Action */}
-                <div className="w-20 flex justify-end">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: "#0f172a" }}
-                  >
-                    Review →
-                  </span>
-                </div>
-              </div>
-            </Link>
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "#94a3b8",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  margin: "0 0 8px",
+                }}
+              >
+                {stat.label}
+              </p>
+              <p
+                style={{
+                  fontSize: 28,
+                  fontWeight: 700,
+                  color: stat.accent ? "#dc2626" : "#0f172a",
+                  margin: 0,
+                  lineHeight: 1,
+                  letterSpacing: "-0.02em",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {stat.value}
+              </p>
+              <p style={{ fontSize: 11, color: "#94a3b8", margin: "6px 0 0" }}>{stat.delta}</p>
+            </div>
           ))}
         </div>
 
-        {/* Footer */}
-        <p
-          className="text-center text-xs mt-8"
-          style={{ color: "#94a3b8", lineHeight: 1.5 }}
+        {/* ── Alert List ───────────────────────────────────────── */}
+        <div
+          style={{
+            backgroundColor: "#ffffff",
+            border: "1px solid #cbd5e1",
+            borderRadius: 4,
+            overflow: "hidden",
+          }}
         >
-          Financial Stress Index · Nightly transaction monitoring · Subscription detection · Behavioral analysis
-        </p>
-      </main>
+          {/* Table header */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 100px",
+              gap: 0,
+              padding: "10px 20px",
+              backgroundColor: "#f8fafc",
+              borderBottom: "1px solid #cbd5e1",
+            }}
+          >
+            {["Client", "Stress Score", "Risk Level", "Confidence", "Trigger", ""].map((h) => (
+              <span
+                key={h}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "#94a3b8",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {h}
+              </span>
+            ))}
+          </div>
+
+          {/* Table rows */}
+          {sorted.map((client, i) => (
+            <div
+              key={client.id}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr 100px",
+                gap: 0,
+                padding: "16px 20px",
+                alignItems: "center",
+                borderBottom:
+                  i < sorted.length - 1 ? "1px solid #edf0f3" : "none",
+                backgroundColor: "#ffffff",
+                cursor: "pointer",
+                transition: "background-color 0.1s ease",
+              }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLDivElement).style.backgroundColor = "#f8fafc")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLDivElement).style.backgroundColor = "#ffffff")
+              }
+            >
+              {/* Client */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      backgroundColor: "#edf0f3",
+                      borderRadius: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#475569",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {client.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </div>
+                  <div>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "#0f172a",
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {client.name}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#94a3b8",
+                        margin: 0,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      ••••{client.accountNumber}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stress score + bar */}
+              <div style={{ paddingRight: 16 }}>
+                {stressBar(client.stressIndex)}
+              </div>
+
+              {/* Risk level */}
+              <div>{riskPill(riskLevel(client.stressIndex))}</div>
+
+              {/* Confidence */}
+              <div>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {client.confidence}
+                </span>
+                <span style={{ fontSize: 11, color: "#94a3b8" }}>%</span>
+              </div>
+
+              {/* Trigger */}
+              <div>
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#475569",
+                    margin: 0,
+                    lineHeight: 1.4,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    maxWidth: 200,
+                  }}
+                  title={client.trigger}
+                >
+                  {client.trigger}
+                </p>
+              </div>
+
+              {/* Action */}
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Link
+                  href={`/clients/${client.id}`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textDecoration: "none",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    border: "1px solid #cbd5e1",
+                    backgroundColor: "#ffffff",
+                    transition: "all 0.1s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#0f172a";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "#ffffff";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor = "#0f172a";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#ffffff";
+                    (e.currentTarget as HTMLAnchorElement).style.color = "#0f172a";
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor = "#cbd5e1";
+                  }}
+                >
+                  Review →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Footer ─────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 16,
+          }}
+        >
+          <p style={{ fontSize: 11, color: "#94a3b8", margin: 0 }}>
+            Financial Stress Index v2.1 · Nightly analysis · Subscription detection · Behavioral scoring
+          </p>
+          <p style={{ fontSize: 11, color: "#94a3b8", margin: 0 }}>
+            Last updated: Today at 06:00 UTC
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
