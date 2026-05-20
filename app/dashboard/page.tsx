@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { clients as initialClients } from "./lib/data";
-import { Client } from "./lib/types";
+import { clients as initialClients } from "../lib/data";
+import { Client } from "../lib/types";
 import Link from "next/link";
 
 function riskLevel(index: number): "high" | "medium" | "low" {
