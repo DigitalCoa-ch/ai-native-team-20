@@ -145,4 +145,48 @@ export default function Dashboard() {
           </div>
           {sorted.map((client, i) => {
             const rl = riskLevel(client.stressIndex);
-            const barColor = client.stressIndex >= 75 ? "#F87171" : client.stressIndex >= 50
+            const barColor = client.stressIndex >= 75 ? "#F87171" : client.stressIndex >= 50 ? "#FB923C" : "#94A3B8";
+            const glowColor = client.stressIndex >= 75 ? "rgba(248,113,113,0.4)" : client.stressIndex >= 50 ? "rgba(251,146,60,0.3)" : "rgba(148,163,184,0.15)";
+            return (
+              <div key={client.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 120px", padding: "22px 28px", alignItems: "center", gap: 20, borderBottom: i < sorted.length - 1 ? "1px solid rgba(51,65,85,0.4)" : "none", transition: "background-color 0.15s ease" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(99,102,241,0.04)")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent")}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 9, background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#818CF8", flexShrink: 0, letterSpacing: "0.06em" }}>
+                    {client.name.split(" ").map((n) => n[0]).join("")}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: "#E2E8F0", margin: 0 }}>{client.name}</p>
+                    <p style={{ fontSize: 11, color: "#475569", margin: "3px 0 0", fontFamily: "var(--font-mono)" }}>****{client.accountNumber}</p>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ flex: 1, height: 5, backgroundColor: "rgba(51,65,85,0.5)", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ width: `${client.stressIndex}%`, height: "100%", backgroundColor: barColor, borderRadius: 3, boxShadow: `0 0 8px ${glowColor}` }}/>
+                  </div>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: barColor, fontFamily: "var(--font-mono)", minWidth: 34, letterSpacing: "-0.03em", textShadow: `0 0 16px ${glowColor}` }}>{client.stressIndex}</span>
+                </div>
+                <div>{riskPill(rl)}</div>
+                <div><span style={{ fontSize: 14, fontWeight: 700, color: "#E2E8F0", fontFamily: "var(--font-mono)" }}>{client.confidence}</span><span style={{ fontSize: 11, color: "#475569" }}>%</span></div>
+                <p style={{ fontSize: 12, color: "#64748B", margin: 0, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }} title={client.trigger}>{client.trigger}</p>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Link href={`/clients/${client.id}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 18px", borderRadius: 8, fontSize: 12, fontWeight: 600, color: "#ffffff", background: "linear-gradient(135deg, #6366F1, #4F46E5)", border: "none", boxShadow: "0 0 16px rgba(99,102,241,0.4)", transition: "all 0.15s ease", letterSpacing: "0.02em", textDecoration: "none" }}
+                    onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = "0 0 24px rgba(99,102,241,0.7)"; el.style.transform = "translateY(-1px)"; }}
+                    onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.boxShadow = "0 0 16px rgba(99,102,241,0.4)"; el.style.transform = "translateY(0)"; }}>
+                    Review →
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20, padding: "0 4px" }}>
+          <p style={{ fontSize: 11, color: "#334155", margin: 0, letterSpacing: "0.03em" }}>Financial Stress Index v2.1 · Nightly analysis · 247 clients · Model: FSI-Gen</p>
+          <p style={{ fontSize: 11, color: "#334155", margin: 0 }}>Last updated: Today at 06:00 UTC</p>
+        </div>
+      </div>
+    </div>
+  );
+}
