@@ -188,11 +188,11 @@ export default function Dashboard() {
                         onMouseLeave={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.boxShadow = "none"; el.style.transform = "translateY(0)"; }}>
                         Approve
                       </button>
-                      <button style={{ padding: "8px 16px", borderRadius: 6, fontSize: 11, fontWeight: 700, border: "1px solid rgba(248,113,113,0.4)", cursor: "pointer", transition: "all 0.2s", backgroundColor: "transparent", color: "#F87171", letterSpacing: "0.06em" }}
-                        onMouseEnter={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.backgroundColor = "rgba(248,113,113,0.1)"; }}
-                        onMouseLeave={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.backgroundColor = "transparent"; }}>
+                      <Link href={`/dashboard/clients/${client.id}`} style={{ display: "inline-block", padding: "8px 16px", borderRadius: 6, fontSize: 11, fontWeight: 700, border: "1px solid rgba(248,113,113,0.4)", textDecoration: "none", transition: "all 0.2s", backgroundColor: "transparent", color: "#F87171", letterSpacing: "0.06em" }}
+                        onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.backgroundColor = "rgba(248,113,113,0.1)"; }}
+                        onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.backgroundColor = "transparent"; }}>
                         Review
-                      </button>
+                      </Link>
                     </>
                   ) : (
                     <span style={{ fontSize: 11, fontWeight: 600, color: client.status === "approved" ? "#34D399" : "#F87171", letterSpacing: "0.06em" }}>{client.status.toUpperCase()}</span>
@@ -212,7 +212,7 @@ export default function Dashboard() {
             <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#6366F1", boxShadow: "0 0 8px #6366F1" }}/>
             <span style={{ fontSize: 11, color: "#94A3B8" }}>AI-generated summaries · Updated nightly · Does not constitute financial advice</span>
           </div>
-          <Link href="/clients" style={{ fontSize: 11, fontWeight: 600, color: "#6366F1", textDecoration: "none", letterSpacing: "0.04em" }}>View all clients →</Link>
+          <Link href="/dashboard/clients" style={{ fontSize: 11, fontWeight: 600, color: "#6366F1", textDecoration: "none", letterSpacing: "0.04em" }}>View all clients →</Link>
         </div>
       </div>
     </div>
