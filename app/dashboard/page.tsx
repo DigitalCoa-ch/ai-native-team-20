@@ -185,7 +185,7 @@ export default function Dashboard() {
                   </td>
                   {/* Action */}
                   <td style={{ padding: "22px 28px" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#F87171", letterSpacing: "0.06em" }}>View -></span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#F87171", letterSpacing: "0.06em" }}>View -&gt;</span>
                   </td>
                 </tr>
               );

@@ -158,7 +158,7 @@ function ClientDetail({client}: {client: Client}) {
                 </div>
                 <h2 style={{fontSize:20,fontWeight:700,color:"#34D399",margin:"0 0 10px"}}>Email Sent Successfully</h2>
                 <p style={{fontSize:13,color:"#475569",margin:"0 0 24px",lineHeight:1.6}}>The outreach email for {client.name} has been approved and sent to the client. This action is logged for compliance records.</p>
-                <Link href="/dashboard" style={{display : inline-flex,alignItems:center,gap:8,padding:10px 24px,borderRadius:6,fontSize:13,fontWeight:600,color:#34D399,backgroundColor:transparent,border:1px solid rgba(52,211,153,0.3),cursor:pointer}}>Return to Dashboard</Link>
+                <Link href="/dashboard" style={{display : "inline-flex",alignItems:"center",gap:8,padding:"10px 24px",borderRadius:6,fontSize:13,fontWeight:600,color:"#34D399",backgroundColor:"transparent",border:"1px solid rgba(52,211,153,0.3)",cursor:"pointer"}}>Return to Dashboard</Link>
               </div>
             ) : rejected ? (
               <div style={{backgroundColor:"rgba(148,163,184,0.07)",border:"1px solid rgba(148,163,184,0.25)",borderRadius:10,padding:"48px 40px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.6)"}}>
