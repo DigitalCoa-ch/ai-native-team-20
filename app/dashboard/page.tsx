@@ -78,7 +78,7 @@ export default function Dashboard() {
     <div style={{ minHeight: "100vh", backgroundColor: "#0B1326", fontFamily: "var(--font-inter)" }}>
 
       {/* ── Navigation ── */}
-      <header style={{ background: "rgba(11,19,38,0.9)", backdropFilter: "blur(16px)", borderBottom: "1px solid #1C253B", position: "sticky", top: 0, zIndex: 100 }}>
+      <header style={{ background: "rgba(11,19,38,0.9)", backdropFilter: "blur(16px)", borderBottom: "1px solid #1C253B", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 38, height: 38, borderRadius: 9, background: "linear-gradient(135deg, #6366F1, #818CF8)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 22px rgba(99,102,241,0.45)" }}>
@@ -105,7 +105,7 @@ export default function Dashboard() {
       </header>
 
       {/* ── Main Content ── */}
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "48px 40px" }}>
+      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "80px 40px 48px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 36 }}>
@@ -137,7 +137,7 @@ export default function Dashboard() {
         </div>
 
         {/* Alert Table */}
-        <div style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+        <div style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 120px", padding: "14px 28px", background: "linear-gradient(180deg, #111827, #0f1523)", borderBottom: "1px solid #334155", gap: 20 }}>
             {["Client", "Stress Score", "Risk Level", "Confidence", "Alert Trigger", "Action"].map((h) => (
               <span key={h} style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>{h}</span>
