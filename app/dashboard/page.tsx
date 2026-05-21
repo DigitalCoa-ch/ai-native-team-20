@@ -70,14 +70,14 @@ export default function Dashboard() {
   const statCards = [
     { label: "Portfolio Size",    value: "247",  sub: "Active clients monitored",     accent: "#38BDF8" },
     { label: "Active Alerts",     value: String(pendingCount),  sub: "Requiring manager review",  accent: pendingCount > 0 ? "#F87171" : "#34D399" },
-    { label: "High Risk Clients", value: String(highRiskCount), sub: "Stress index ≥ 75",        accent: "#F87171" },
+    { label: "High Risk Clients", value: String(highRiskCount), sub: "Stress index >= 75",        accent: "#F87171" },
     { label: "Model Accuracy",   value: "86%", sub: "Avg detection precision",      accent: "#6366F1" },
   ];
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0B1326", fontFamily: "var(--font-inter)" }}>
 
-      {/* ── Navigation ── */}
+      {/* Navigation */}
       <header style={{ background: "rgba(11,19,38,0.9)", backdropFilter: "blur(16px)", borderBottom: "1px solid #1C253B", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -104,7 +104,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* ── Main Content ── */}
+      {/* Main Content */}
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "80px 40px 48px" }}>
 
         {/* Header */}
@@ -112,11 +112,11 @@ export default function Dashboard() {
           <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
             <div>
               <h1 style={{ fontSize: 30, fontWeight: 700, color: "#E2E8F0", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0 }}>Financial Stress Alerts</h1>
-              <p style={{ fontSize: 14, color: "#475569", marginTop: 10, lineHeight: 1.6 }}>Nightly AI analysis across your entire client portfolio — ranked by Financial Stress Index</p>
+              <p style={{ fontSize: 14, color: "#475569", marginTop: 10, lineHeight: 1.6 }}>Nightly AI analysis across your entire client portfolio -- ranked by Financial Stress Index</p>
             </div>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 8, backgroundColor: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
               <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#34D399", boxShadow: "0 0 8px #34D399" }}/>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#34D399", letterSpacing: "0.06em" }}>LIVE · Updated 06:00 UTC</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#34D399", letterSpacing: "0.06em" }}>LIVE - Updated 06:00 UTC</span>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function Dashboard() {
 
         {/* Alert Table */}
         <div style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 120px", padding: "14px 28px", background: "linear-gradient(180deg, #111827, #0f1523)", borderBottom: "1px solid #334155", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 200px", padding: "14px 28px", background: "linear-gradient(180deg, #111827, #0f1523)", borderBottom: "1px solid #334155", gap: 20 }}>
             {["Client", "Stress Score", "Risk Level", "Confidence", "Alert Trigger", "Action"].map((h) => (
               <span key={h} style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>{h}</span>
             ))}
@@ -148,9 +148,7 @@ export default function Dashboard() {
             const barColor = client.stressIndex >= 75 ? "#F87171" : client.stressIndex >= 50 ? "#FB923C" : "#94A3B8";
             const glowColor = client.stressIndex >= 75 ? "rgba(248,113,113,0.4)" : client.stressIndex >= 50 ? "rgba(251,146,60,0.3)" : "rgba(148,163,184,0.15)";
             return (
-              <div key={client.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 120px", padding: "22px 28px", alignItems: "center", gap: 20, borderBottom: i < sorted.length - 1 ? "1px solid rgba(51,65,85,0.4)" : "none", transition: "background-color 0.15s ease" }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLDivElement).style.backgroundColor = "rgba(99,102,241,0.04)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent")}>
+              <Link key={client.id} href={`/dashboard/clients/${client.id}`} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 200px", padding: "22px 28px", alignItems: "center", gap: 20, borderBottom: i < sorted.length - 1 ? "1px solid rgba(51,65,85,0.4)" : "none", textDecoration: "none" }}>
                 {/* Client */}
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 9, background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#818CF8", flexShrink: 0, letterSpacing: "0.06em" }}>
@@ -179,26 +177,11 @@ export default function Dashboard() {
                 </div>
                 {/* Alert Trigger */}
                 <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.5 }}>{client.trigger}</p>
-                {/* Action */}
-                <div style={{ display: "flex", gap: 8 }}>
-                  {client.status === "pending" ? (
-                    <>
-                      <button style={{ padding: "8px 16px", borderRadius: 6, fontSize: 11, fontWeight: 700, border: "none", cursor: "pointer", transition: "all 0.2s", backgroundColor: "#6366F1", color: "#fff", letterSpacing: "0.06em" }}
-                        onMouseEnter={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.boxShadow = "0 0 20px rgba(99,102,241,0.6)"; el.style.transform = "translateY(-1px)"; }}
-                        onMouseLeave={(e) => { const el = e.currentTarget as HTMLButtonElement; el.style.boxShadow = "none"; el.style.transform = "translateY(0)"; }}>
-                        Approve
-                      </button>
-                      <Link href={`/dashboard/clients/${client.id}`} style={{ display: "inline-block", padding: "8px 16px", borderRadius: 6, fontSize: 11, fontWeight: 700, border: "1px solid rgba(248,113,113,0.4)", textDecoration: "none", transition: "all 0.2s", backgroundColor: "transparent", color: "#F87171", letterSpacing: "0.06em" }}
-                        onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.backgroundColor = "rgba(248,113,113,0.1)"; }}
-                        onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.backgroundColor = "transparent"; }}>
-                        Review
-                      </Link>
-                    </>
-                  ) : (
-                    <span style={{ fontSize: 11, fontWeight: 600, color: client.status === "approved" ? "#34D399" : "#F87171", letterSpacing: "0.06em" }}>{client.status.toUpperCase()}</span>
-                  )}
+                {/* Action - row is fully clickable via Link wrapper */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative", zIndex: 2, pointerEvents: "auto" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#F87171", letterSpacing: "0.06em" }}>View -></span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -210,9 +193,9 @@ export default function Dashboard() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", backgroundColor: "rgba(99,102,241,0.04)", borderRadius: 10, border: "1px solid rgba(99,102,241,0.1)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#6366F1", boxShadow: "0 0 8px #6366F1" }}/>
-            <span style={{ fontSize: 11, color: "#94A3B8" }}>AI-generated summaries · Updated nightly · Does not constitute financial advice</span>
+            <span style={{ fontSize: 11, color: "#94A3B8" }}>AI-generated summaries - Updated nightly - Does not constitute financial advice</span>
           </div>
-          <Link href="/dashboard/clients" style={{ fontSize: 11, fontWeight: 600, color: "#6366F1", textDecoration: "none", letterSpacing: "0.04em" }}>View all clients →</Link>
+          <Link href="/dashboard/clients" style={{ fontSize: 11, fontWeight: 600, color: "#6366F1", textDecoration: "none", letterSpacing: "0.04em" }}>View all clients</Link>
         </div>
       </div>
     </div>
