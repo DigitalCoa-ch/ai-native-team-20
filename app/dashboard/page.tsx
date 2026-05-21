@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { clients as initialClients } from "../lib/data";
 import { Client } from "../lib/types";
-import Link from "next/link";
 
 function riskLevel(index: number): "high" | "medium" | "low" {
   if (index >= 75) return "high";
@@ -22,12 +22,12 @@ function riskPill(level: ReturnType<typeof riskLevel>) {
       display: "inline-flex", alignItems: "center", gap: 5,
       padding: "4px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700,
       letterSpacing: "0.1em", textTransform: "uppercase" as const,
-      backgroundColor: map.bg, color: map.text, border: `1px solid ${map.border}`,
-      boxShadow: map.glow !== "transparent" ? `0 0 10px ${map.glow}` : "none",
+      backgroundColor: map.bg, color: map.text, border: "1px solid " + map.border,
+      boxShadow: map.glow !== "transparent" ? "0 0 10px " + map.glow : "none",
     }}>
       <span style={{
         width: 5, height: 5, borderRadius: "50%", backgroundColor: map.text,
-        boxShadow: `0 0 6px ${map.text}`,
+        boxShadow: "0 0 6px " + map.text,
       }}/>
       {map.label}
     </span>
@@ -62,6 +62,7 @@ function statIcon(label: string, accent: string) {
 }
 
 export default function Dashboard() {
+  const router = useRouter();
   const [clients] = useState<Client[]>(initialClients);
   const sorted = [...clients].sort((a, b) => b.stressIndex - a.stressIndex);
   const pendingCount = sorted.filter((c) => c.status === "pending").length;
@@ -73,7 +74,6 @@ export default function Dashboard() {
     { label: "High Risk Clients", value: String(highRiskCount), sub: "Stress index >= 75",        accent: "#F87171" },
     { label: "Model Accuracy",   value: "86%", sub: "Avg detection precision",      accent: "#6366F1" },
   ];
-
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0B1326", fontFamily: "var(--font-inter)" }}>
 
@@ -95,8 +95,8 @@ export default function Dashboard() {
             ))}
           </nav>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 8, backgroundColor: pendingCount > 0 ? "rgba(248,113,113,0.1)" : "rgba(52,211,153,0.1)", border: `1px solid ${pendingCount > 0 ? "rgba(248,113,113,0.3)" : "rgba(52,211,153,0.3)"}` }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: pendingCount > 0 ? "#F87171" : "#34D399", boxShadow: `0 0 8px ${pendingCount > 0 ? "#F87171" : "#34D399"}` }}/>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 8, backgroundColor: pendingCount > 0 ? "rgba(248,113,113,0.1)" : "rgba(52,211,153,0.1)", border: "1px solid " + (pendingCount > 0 ? "rgba(248,113,113,0.3)" : "rgba(52,211,153,0.3)") }}>
+              <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: pendingCount > 0 ? "#F87171" : "#34D399", boxShadow: "0 0 8px " + (pendingCount > 0 ? "#F87171" : "#34D399") }}/>
               <span style={{ fontSize: 11, fontWeight: 700, color: pendingCount > 0 ? "#F87171" : "#34D399", letterSpacing: "0.08em" }}>{pendingCount} ALERTS</span>
             </div>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: "linear-gradient(135deg, #1C253B, #334155)", border: "1px solid #334155", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: "0.08em" }}>JM</div>
@@ -124,10 +124,8 @@ export default function Dashboard() {
         {/* Stats Row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
           {statCards.map((card) => (
-            <div key={card.label} style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 12, padding: "24px", position: "relative", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.5)", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-2px)"; el.style.boxShadow = "0 16px 48px rgba(0,0,0,0.7)"; }}
-              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(0)"; el.style.boxShadow = "0 8px 32px rgba(0,0,0,0.5)"; }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${card.accent}, transparent)`, opacity: 0.7 }}/>
+            <div key={card.label} style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 12, padding: "24px", position: "relative", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, " + card.accent + ", transparent)", opacity: 0.7 }}/>
               <div style={{ marginBottom: 14 }}>{statIcon(card.label, card.accent)}</div>
               <p style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.12em", textTransform: "uppercase" as const, margin: "0 0 8px" }}>{card.label}</p>
               <p style={{ fontSize: 34, fontWeight: 700, color: card.accent, fontFamily: "var(--font-mono)", margin: 0, lineHeight: 1, letterSpacing: "-0.04em" }}>{card.value}</p>
@@ -137,54 +135,63 @@ export default function Dashboard() {
         </div>
 
         {/* Alert Table */}
-        <div style={{ backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 200px", padding: "14px 28px", background: "linear-gradient(180deg, #111827, #0f1523)", borderBottom: "1px solid #334155", gap: 20 }}>
-            {["Client", "Stress Score", "Risk Level", "Confidence", "Alert Trigger", "Action"].map((h) => (
-              <span key={h} style={{ fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>{h}</span>
-            ))}
-          </div>
-          {sorted.map((client, i) => {
-            const rl = riskLevel(client.stressIndex);
-            const barColor = client.stressIndex >= 75 ? "#F87171" : client.stressIndex >= 50 ? "#FB923C" : "#94A3B8";
-            const glowColor = client.stressIndex >= 75 ? "rgba(248,113,113,0.4)" : client.stressIndex >= 50 ? "rgba(251,146,60,0.3)" : "rgba(148,163,184,0.15)";
-            return (
-              <Link key={client.id} href={`/dashboard/clients/${client.id}`} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.3fr 1.1fr 2fr 200px", padding: "22px 28px", alignItems: "center", gap: 20, borderBottom: i < sorted.length - 1 ? "1px solid rgba(51,65,85,0.4)" : "none", textDecoration: "none" }}>
-                {/* Client */}
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 9, background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#818CF8", flexShrink: 0, letterSpacing: "0.06em" }}>
-                    {client.name.split(" ").map((n) => n[0]).join("")}
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: "#E2E8F0", margin: 0 }}>{client.name}</p>
-                    <p style={{ fontSize: 11, color: "#475569", margin: "3px 0 0", fontFamily: "var(--font-mono)" }}>****{client.accountNumber}</p>
-                  </div>
-                </div>
-                {/* Stress Score */}
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: "rgba(51,65,85,0.5)", position: "relative", maxWidth: 80 }}>
-                    <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 2, width: `${client.stressIndex}%`, backgroundColor: barColor, boxShadow: `0 0 8px ${glowColor}` }}/>
-                  </div>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: barColor, fontFamily: "var(--font-mono)" }}>{client.stressIndex}</span>
-                </div>
-                {/* Risk Level */}
-                <div>{riskPill(rl)}</div>
-                {/* Confidence */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#94A3B8", fontFamily: "var(--font-mono)" }}>{client.confidence}%</span>
-                  <div style={{ width: 36, height: 3, borderRadius: 2, backgroundColor: "rgba(51,65,85,0.4)" }}>
-                    <div style={{ height: "100%", borderRadius: 2, width: `${client.confidence}%`, backgroundColor: "#6366F1" }}/>
-                  </div>
-                </div>
-                {/* Alert Trigger */}
-                <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.5 }}>{client.trigger}</p>
-                {/* Action - row is fully clickable via Link wrapper */}
-                <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative", zIndex: 2, pointerEvents: "auto" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#F87171", letterSpacing: "0.06em" }}>View -></span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+        <table style={{ width: "100%", backgroundColor: "#1C253B", border: "1px solid #334155", borderRadius: 16, borderCollapse: "separate", overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+          <thead>
+            <tr style={{ background: "linear-gradient(180deg, #111827, #0f1523)", borderBottom: "1px solid #334155" }}>
+              {["Client", "Stress Score", "Risk Level", "Confidence", "Alert Trigger", "Action"].map((h) => (
+                <td key={h} style={{ padding: "14px 28px", fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: "0.12em", textTransform: "uppercase" as const }}>{h}</td>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((client, i) => {
+              const rl = riskLevel(client.stressIndex);
+              const barColor = client.stressIndex >= 75 ? "#F87171" : client.stressIndex >= 50 ? "#FB923C" : "#94A3B8";
+              const glowColor = client.stressIndex >= 75 ? "rgba(248,113,113,0.4)" : client.stressIndex >= 50 ? "rgba(251,146,60,0.3)" : "rgba(148,163,184,0.15)";
+              return (
+                <tr key={client.id}
+                  onClick={() => router.push("/dashboard/clients/" + client.id)}
+                  style={{ cursor: "pointer", borderBottom: i < sorted.length - 1 ? "1px solid rgba(51,65,85,0.4)" : "none" }}>
+                  {/* Client */}
+                  <td style={{ padding: "22px 28px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 9, background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))", border: "1px solid rgba(99,102,241,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#818CF8", flexShrink: 0, letterSpacing: "0.06em" }}>
+                        {client.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 600, color: "#E2E8F0", margin: 0 }}>{client.name}</p>
+                        <p style={{ fontSize: 11, color: "#475569", margin: "3px 0 0", fontFamily: "var(--font-mono)" }}>****{client.accountNumber}</p>
+                      </div>
+                    </div>
+                  </td>
+                  {/* Stress Score */}
+                  <td style={{ padding: "22px 28px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 80, height: 4, borderRadius: 2, backgroundColor: "rgba(51,65,85,0.5)" }}>
+                        <div style={{ width: client.stressIndex + "%", height: "100%", borderRadius: 2, backgroundColor: barColor, boxShadow: "0 0 8px " + glowColor }}/>
+                      </div>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: barColor, fontFamily: "var(--font-mono)" }}>{client.stressIndex}</span>
+                    </div>
+                  </td>
+                  {/* Risk Level */}
+                  <td style={{ padding: "22px 28px" }}>{riskPill(rl)}</td>
+                  {/* Confidence */}
+                  <td style={{ padding: "22px 28px" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#94A3B8", fontFamily: "var(--font-mono)" }}>{client.confidence}%</span>
+                  </td>
+                  {/* Alert Trigger */}
+                  <td style={{ padding: "22px 28px" }}>
+                    <p style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.5 }}>{client.trigger}</p>
+                  </td>
+                  {/* Action */}
+                  <td style={{ padding: "22px 28px" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#F87171", letterSpacing: "0.06em" }}>View -></span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
         {/* Bottom spacing */}
         <div style={{ height: 40 }}/>
@@ -195,7 +202,6 @@ export default function Dashboard() {
             <div style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#6366F1", boxShadow: "0 0 8px #6366F1" }}/>
             <span style={{ fontSize: 11, color: "#94A3B8" }}>AI-generated summaries - Updated nightly - Does not constitute financial advice</span>
           </div>
-          <Link href="/dashboard/clients" style={{ fontSize: 11, fontWeight: 600, color: "#6366F1", textDecoration: "none", letterSpacing: "0.04em" }}>View all clients</Link>
         </div>
       </div>
     </div>
